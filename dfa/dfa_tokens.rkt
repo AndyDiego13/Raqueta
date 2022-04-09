@@ -1,6 +1,7 @@
 #|
   Implement Deterministic Finite Automata that recognized tokens (Lexer)
   Andrea Serrano Diego - A01028728
+  Ariadne Alvarez Reyes - A01652080
   08/abril/2022
 |#
 

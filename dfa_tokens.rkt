@@ -14,7 +14,6 @@
     ( [lst (string->list input-string)]
       [transition (car dfa)] ; The first element in the list
       [state (cadr dfa)]     ; The second element in the list
-      ; [item (cadr dfa)]    ; - The third element in list ()
       [item-list empty]      ; - List of elements
       [token-list empty])    ; - List of types of tokens
     (if (empty? lst)
@@ -62,7 +61,7 @@
       [(eq? state 'q0) (cond ; Initial char
         ; 0...9
         [(char-numeric? symbol) (values 'int #f symbol)]
-        ; blank space or tab
+        ; blank space
         [(char-blank? symbol) (values 'q0 #f symbol)]
         ; negative numbers
         [(eq? symbol #\-) (values 'int #f symbol)]
@@ -70,12 +69,12 @@
         [(char-alphabetic? symbol) (values 'variable #f symbol)]
         ; parentheses
         [(member symbol parentheses) (values 'parenthesis #f symbol)]
-        ; arithmetic operator and decimal point
+        ; arithmetic operator and point
         [else (values 'invalid #f symbol)])]
       [(eq? state 'parenthesis) (cond ; Initial char
         ; 0...9
         [(char-numeric? symbol) (values 'int 'parenthesis symbol)]
-        ; blank space or tab
+        ; blank space
         [(char-blank? symbol) (values 'space 'parenthesis symbol)]
         ; negative numbers
         [(eq? symbol #\-) (values 'int #f symbol)]
@@ -83,40 +82,40 @@
         [(char-alphabetic? symbol) (values 'variable 'parenthesis symbol)]
         ; parentheses
         [(member symbol parentheses) (values 'parenthesis 'parenthesis symbol)]
-        ; arithmetic operator and decimal point
+        ; arithmetic operator and point
         [else (values 'invalid #f symbol)])]
       [(eq? state 'int) (cond ; Int
         ; 0...9
         [(char-numeric? symbol) (values 'int #f symbol)]
-        ; blank space or tab
+        ; blank space
         [(char-blank? symbol) (values 'blank-after-var 'int symbol)]
         ; arithmetic operators
         [(member symbol operator) (values 'operator 'int symbol)]
-        ; decimal point
+        ; point
         [(eq? symbol #\.) (values 'float #f symbol)]
         ; parentheses
         [(member symbol parentheses) (values 'parenthesis 'int symbol)]
         ; letters or something else
         [else (values 'invalid #f symbol)] )]
-      [(eq? state 'float) (cond ; Number after decimal point
+      [(eq? state 'float) (cond ; Number after point
         ; 0...9
         [(char-numeric? symbol) (values 'float #f symbol)]
-        ; blank space or tab
+        ; blank space
         [(char-blank? symbol) (values 'blank-after-var 'float symbol)]
         ; arithmetic operators
         [(member symbol operator) (values 'operator 'float symbol)]
-        ; decimal point
+        ; point
         [(eq? symbol #\.) (values 'invalid 'float symbol)]
         ; parentheses
         [(member symbol parentheses) (values 'parenthesis 'float symbol)]
         ; variable or something else
         [else (values 'invalid #f symbol)] )]
       [(eq? state 'space) (cond ; Space
-        ; blank space or tab
+        ; blank space
         [(char-blank? symbol) (values 'space #f symbol)]
         ; arithmetic operators
         [(member symbol operator) (values 'operator #f symbol)]
-        ; decimal point
+        ; point
         [(eq? symbol #\.) (values 'invalid #f symbol)]
         ; 0...9
         [(char-numeric? symbol) (values 'int #f symbol)]
@@ -127,13 +126,13 @@
         ; something else
         [else (values 'invalid #f symbol)] )]
       [(eq? state 'operator) (cond ; Symbol
-        ; blank space or tab
+        ; blank space
         [(char-blank? symbol) (values 'blank-after-symbol 'operator symbol)]
         ; 0...9
         [(char-numeric? symbol) (values 'int 'operator symbol)]
         ; arithmetic operator
         [(member symbol operator) (values 'invalid 'operator symbol)]
-        ; decimal point
+        ; point
         [(eq? symbol #\.) (values 'invalid 'operator symbol)]
         ; variable
         [(char-alphabetic? symbol) (values 'variable 'operator symbol)]
@@ -142,11 +141,11 @@
         ; something else
         [else (values 'invalid #f symbol)] )]
       [(eq? state 'blank-after-symbol) (cond ; blank space after symbol
-        ; blank space or tab 
+        ; blank space
         [(char-blank? symbol) (values 'blank-after-symbol #f symbol)]
         ; arithmetic operators
         [(member symbol operator) (values 'invalid #f symbol)]
-        ; decimal point
+        ; point
         [(eq? symbol #\.) (values 'invalid #f symbol)]
         ; 0...9
         [(char-numeric? symbol) (values 'int #f symbol)]
@@ -157,7 +156,7 @@
         ; something else
         [else (values 'invalid #f)] )]
       [(eq? state 'blank-after-var) (cond ; blank space after a variable
-        ; blank space or tab
+        ; blank space
         [(char-blank? symbol) (values 'blank-after-var #f symbol)] 
         ; arithemtic operator
         [(member symbol operator) (values 'operator #f symbol)]
@@ -174,7 +173,7 @@
         [(eq? symbol #\_) (values 'variable #f symbol)]
         ; arithmetic operator
         [(member symbol operator) (values 'operator 'variable symbol)]
-        ; blank space or tab 
+        ; blank space 
         [(char-blank? symbol) (values 'blank-after-var 'variable symbol)]
         ; parentheses
         [(member symbol parentheses) (values 'parenthesis 'variable symbol)]
